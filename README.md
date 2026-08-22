@@ -8,7 +8,7 @@
 
 A reference implementation of an agentic RAG system that detects and explains conflicts between US (FDA) and EU (EMA) drug regulations — trial design requirements, approval pathways, patient population restrictions — and grounds every claim in a citation back to the source document.
 
-> **Status:** 🚧 In active development. See [Build Status](#build-status) below for what's working.
+> **Status:** In active development. See [Build Status](#build-status) below for what's working.
 
 ---
 
