@@ -12,8 +12,7 @@ from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
 
-from src.config import GEMINI_API_KEY, GEMINI_MODEL
-
+from src.config import GEMINI_API_KEY, GEMINI_VERIFIER_MODEL, call_gemini_with_retry
 
 class ClaimAudit(BaseModel):
     claim_text: str = Field(
@@ -60,7 +59,7 @@ RULES:
 def verify_draft_report(
     draft_report: str,
     retrieved_chunks: Dict[str, str],
-    model_name: str = GEMINI_MODEL,
+    model_name: str = GEMINI_VERIFIER_MODEL,
 ) -> VerificationReport:
     """
     Independent verification pass.
@@ -87,7 +86,8 @@ def verify_draft_report(
 Perform the factual audit of all cited claims in the draft report against the ground truth chunks.
 """
 
-    response = client.models.generate_content(
+    response = call_gemini_with_retry(
+        client=client,
         model=model_name,
         contents=prompt,
         config=types.GenerateContentConfig(

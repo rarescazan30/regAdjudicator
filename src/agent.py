@@ -5,11 +5,12 @@ trajectory logging, draft report generation, and verification retries.
 """
 
 import os
+import time
 from typing import Dict, Any, List, Optional
 from google import genai
 from google.genai import types
 
-from src.config import GEMINI_API_KEY, GEMINI_MODEL
+from src.config import GEMINI_API_KEY, GEMINI_AGENT_MODEL, call_gemini_with_retry
 from src.tools import TOOL_DEFINITIONS, execute_tool
 from src.verify import verify_draft_report, VerificationReport
 
@@ -37,7 +38,7 @@ class RegulatoryAgent:
     Manages conversational turn buffer, dynamic tool calls, and trace logs.
     """
 
-    def __init__(self, model_name: str = GEMINI_MODEL):
+    def __init__(self, model_name: str = GEMINI_AGENT_MODEL):
         if not GEMINI_API_KEY:
             raise ValueError(
                 "GEMINI_API_KEY is not set. Please add it to your .env file."
@@ -77,8 +78,9 @@ class RegulatoryAgent:
         while step < max_steps:
             step += 1
 
-            # 1. Call Gemini LLM with current message history and available tools
-            response = self.client.models.generate_content(
+            # 1. Call Gemini LLM with current message history and available tools, with 4s timeoff in case of quota exceeded
+            response = call_gemini_with_retry(
+                client = self.client,
                 model=self.model_name,
                 contents=contents,
                 config=types.GenerateContentConfig(
@@ -198,7 +200,8 @@ Regenerate the report. Fix the specific claims that failed, or explicitly mark t
 Preserve all accurate citations and keep the same report structure.
 """
                 # Request a corrected draft from Gemini
-                correction_response = self.client.models.generate_content(
+                correction_response = call_gemini_with_retry(
+                    client = self.client,
                     model=self.model_name,
                     contents=correction_prompt,
                     config=types.GenerateContentConfig(
@@ -221,23 +224,3 @@ Preserve all accurate citations and keep the same report structure.
             "retries_used": retry_count,
         }
 
-# example use
-if __name__ == "__main__":
-    agent = RegulatoryAgent()
-    query = "Compare FDA and EMA decisions on Lecanemab (Leqembi). Did both agencies approve it, and with what restrictions?"
-    
-    print(f"User Query: {query}\n")
-    print("Executing Autonomous ReAct Loop + Two-Pass Verification...")
-    result = agent.run(query)
-    
-    print("\n--- 1. Tool Call Trajectory ---")
-    print(" -> ".join(result["trajectory"]))
-    
-    print(f"\n--- 2. Verification Status: {'PASSED' if result['is_verified'] else 'FAILED'} (Retries Used: {result['retries_used']}) ---")
-    for audit in result["verification_history"]:
-        print(f"Attempt {audit['attempt']}: All Supported = {audit['all_supported']}")
-        if not audit["all_supported"]:
-            print(f"Feedback: {audit['feedback']}")
-            
-    print("\n--- 3. Final Verified Report ---")
-    print(result["final_report"])

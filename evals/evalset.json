@@ -1,0 +1,110 @@
+[
+  {
+    "id": "case_01_aducanumab_divergence",
+    "category": "comparative",
+    "query": "Is Aducanumab (Aduhelm) authorized in both the US and EU? Explain why the two regulatory bodies reached different decisions.",
+    "expected_postures": ["DIVERGENT"],
+    "required_tools": ["search_fda", "search_ema"],
+    "forbidden_tools": [],
+    "expected_keywords": ["Accelerated Approval", "EMERGE", "ENGAGE"]
+  },
+  {
+    "id": "case_02_lecanemab_restrictions",
+    "category": "comparative",
+    "query": "Compare FDA and EMA approval scopes for Lecanemab (Leqembi). Did both agencies approve it and what restrictions exist regarding ApoE genotypes?",
+    "expected_postures": ["DIVERGENT"],
+    "required_tools": ["search_fda", "search_ema"],
+    "forbidden_tools": [],
+    "expected_keywords": ["ApoE", "ARIA"]
+  },
+  {
+    "id": "case_03_bevacizumab_breast_cancer",
+    "category": "comparative",
+    "query": "What is the current regulatory status of Bevacizumab (Avastin) for metastatic breast cancer in the US versus the European Union?",
+    "expected_postures": ["DIVERGENT"],
+    "required_tools": ["search_fda", "search_ema"],
+    "forbidden_tools": [],
+    "expected_keywords": ["revoked", "paclitaxel"]
+  },
+  {
+    "id": "case_04_olaparib_prostate_cancer",
+    "category": "comparative",
+    "query": "How do FDA and EMA indications differ for Olaparib (Lynparza) in metastatic castration-resistant prostate cancer (mCRPC)?",
+    "expected_postures": ["DIVERGENT"],
+    "required_tools": ["search_fda", "search_ema"],
+    "forbidden_tools": [],
+    "expected_keywords": ["BRCA", "mCRPC"]
+  },
+  {
+    "id": "case_05_fda_accelerated_approval_guidance",
+    "category": "us_only",
+    "query": "In the United States only, what are the statutory criteria and surrogate endpoint requirements for FDA Accelerated Approval under 21 CFR Part 314 Subpart H?",
+    "expected_postures": ["HARMONIZED", "FDA", "US", "ACCELERATED APPROVAL"],
+    "required_tools": ["search_fda"],
+    "forbidden_tools": ["search_ema"],
+    "expected_keywords": ["surrogate endpoint", "reasonably likely"]
+  },
+  {
+    "id": "case_06_fda_aducanumab_pathway",
+    "category": "us_only",
+    "query": "Under what specific regulatory pathway and BLA number did the US FDA approve Aducanumab in 2021 in the US?",
+    "expected_postures": ["HARMONIZED", "FDA", "US", "DIVERGENT", "ACCELERATED APPROVAL"],
+    "required_tools": ["search_fda"],
+    "forbidden_tools": [],
+    "expected_keywords": ["accelerat"]
+  },
+  {
+    "id": "case_07_fda_lecanemab_conversion",
+    "category": "us_only",
+    "query": "In the United States only, when did the FDA convert Lecanemab from Accelerated Approval to Traditional Standard Approval, and based on which trial?",
+    "expected_postures": ["HARMONIZED", "FDA", "US", "DIVERGENT", "STANDARD APPROVAL"],
+    "required_tools": ["search_fda"],
+    "forbidden_tools": [],
+    "expected_keywords": ["2023", "Clarity AD"]
+  },
+  {
+    "id": "case_08_ema_conditional_marketing_guidance",
+    "category": "eu_only",
+    "query": "In the European Union only, what are the legal requirements for EMA Conditional Marketing Authorisation under Regulation (EC) No 507/2006?",
+    "expected_postures": ["HARMONIZED", "EMA", "EU", "CONDITIONAL"],
+    "required_tools": ["search_ema"],
+    "forbidden_tools": ["search_fda"],
+    "expected_keywords": ["unmet", "benefit"]
+  },
+  {
+    "id": "case_09_ema_aducanumab_chmp_refusal",
+    "category": "eu_only",
+    "query": "In the European Union only, what were the primary grounds for the EMA CHMP negative opinion and refusal recommendation for Aduhelm in December 2021?",
+    "expected_postures": ["HARMONIZED", "EMA", "EU", "DIVERGENT", "REFUSAL", "NEGATIVE"],
+    "required_tools": ["search_ema"],
+    "forbidden_tools": [],
+    "expected_keywords": ["ARIA"]
+  },
+  {
+    "id": "case_10_ema_lecanemab_reexamination",
+    "category": "eu_only",
+    "query": "In the European Union only, explain how the EMA CHMP revised its initial July 2024 refusal of Leqembi to a positive opinion in November 2024.",
+    "expected_postures": ["HARMONIZED", "EMA", "EU", "DIVERGENT", "RESTRICTED"],
+    "required_tools": ["search_ema"],
+    "forbidden_tools": [],
+    "expected_keywords": ["re-examination", "ApoE"]
+  },
+  {
+    "id": "case_11_unapproved_fictional_drug",
+    "category": "edge_case",
+    "query": "What is the cross-jurisdictional regulatory approval status for the experimental oncological compound XYLOPHEN-99 for glioblastoma?",
+    "expected_postures": ["INSUFFICIENT EVIDENCE", "NOT FOUND", "UNAPPROVED", "UNKNOWN", "NO EVIDENCE", "NOT AVAILABLE"],
+    "required_tools": [],
+    "forbidden_tools": [],
+    "expected_keywords": []
+  },
+  {
+    "id": "case_12_off_label_unsupported_indication",
+    "category": "edge_case",
+    "query": "Compare FDA and EMA approvals for using Olaparib to treat pediatric type 1 diabetes.",
+    "expected_postures": ["HARMONIZED", "INSUFFICIENT EVIDENCE", "NOT FOUND", "UNAPPROVED", "NO EVIDENCE", "NOT APPROVED", "NOT INDICATED"],
+    "required_tools": [],
+    "forbidden_tools": [],
+    "expected_keywords": []
+  }
+]
