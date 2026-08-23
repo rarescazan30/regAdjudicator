@@ -175,8 +175,8 @@ Current results: X/12 passing. See evals/evalset.json for individual cases.
 
 ## Build status
 
-- [ ] Data ingestion (FDA + EMA, 4 drugs + guidance docs)
-- [ ] Retrieval layer (ChromaDB, chunking, search functions)
+- [x] Data ingestion (FDA + EMA, 4 drugs + guidance docs)
+- [x] Retrieval layer (ChromaDB, chunking, search functions)
 - [ ] Tool schemas + agent ReAct loop
 - [ ] Verifier module
 - [ ] Eval suite
