@@ -1,0 +1,5 @@
+drug_id,brand_name,generic_name,drug_class,indication,fda_status,fda_pathway,ema_status,ema_pathway
+aducanumab,Aduhelm,Aducanumab,Monoclonal antibody (anti-amyloid beta),Alzheimer's disease,Approved,Accelerated Approval based on surrogate amyloid reduction,Refused,Marketing authorisation refused due to unproven clinical benefit
+lecanemab,Leqembi,Lecanemab,Monoclonal antibody (anti-amyloid beta),Early Alzheimer's disease,Approved,Traditional Standard Approval for broad early AD,Approved with restrictions,Authorised with restriction to ApoE ε4 non-carriers and heterozygotes
+bevacizumab,Avastin,Bevacizumab,Monoclonal antibody (anti-VEGF),Metastatic breast cancer,Revoked,Indication revoked in 2011 after confirmatory trials failed to show OS benefit,Approved,Authorised and maintained in combination with paclitaxel
+olaparib,Lynparza,Olaparib,PARP inhibitor,Metastatic castration-resistant prostate cancer,Approved,Restricted strictly to BRCA-mutated mCRPC,Approved,Authorised for broad mCRPC population in combination with abiraterone
