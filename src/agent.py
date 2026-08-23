@@ -11,6 +11,7 @@ from google.genai import types
 
 from src.config import GEMINI_API_KEY, GEMINI_MODEL
 from src.tools import TOOL_DEFINITIONS, execute_tool
+from src.verify import verify_draft_report, VerificationReport
 
 
 # System Prompt: Strict Guardrails and Output Structure
@@ -147,17 +148,96 @@ class RegulatoryAgent:
             "retrieved_chunks": retrieved_chunks,
         }
 
+    def run(self, query: str, max_retries: int = 2) -> Dict[str, Any]:
+        """
+        Full autonomous pipeline:
+        1. Runs ReAct loop to retrieve facts and draft report.
+        2. Runs independent Verifier pass on cited claims.
+        3. If verification fails, feeds feedback back to agent for self-correction (max 2 retries).
+        """
+        react_result = self.run_react_loop(query)
+        draft_report = react_result["draft_report"]
+        retrieved_chunks = react_result["retrieved_chunks"]
+        trajectory = react_result["trajectory"]
 
+        verification_history: List[Dict[str, Any]] = []
+        final_report = draft_report
+        retry_count = 0
+
+        # Step 2: Verification and Self-Correction Loop
+        while retry_count <= max_retries:
+            # Run independent verification pass
+            verdict: VerificationReport = verify_draft_report(
+                draft_report=final_report,
+                retrieved_chunks=retrieved_chunks,
+                model_name=self.model_name,
+            )
+
+            verification_history.append({
+                "attempt": retry_count + 1,
+                "all_supported": verdict.all_supported,
+                "audited_claims": [c.model_dump() for c in verdict.audited_claims],
+                "feedback": verdict.feedback_for_correction,
+            })
+
+            # If all claims are supported by source chunks, we are done
+            if verdict.all_supported:
+                break
+
+            # If unsupported claims exist and we have retries left, trigger correction
+            if retry_count < max_retries:
+                retry_count += 1
+                correction_prompt = f"""
+Your previous draft report contained factual claims that FAILED independent verification against the source chunks:
+
+FEEDBACK FROM AUDITOR:
+{verdict.feedback_for_correction}
+
+INSTRUCTIONS:
+Regenerate the report. Fix the specific claims that failed, or explicitly mark them as [INSUFFICIENT EVIDENCE].
+Preserve all accurate citations and keep the same report structure.
+"""
+                # Request a corrected draft from Gemini
+                correction_response = self.client.models.generate_content(
+                    model=self.model_name,
+                    contents=correction_prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_PROMPT,
+                        temperature=0.1,
+                    ),
+                )
+                final_report = correction_response.text or final_report
+            else:
+                # Retries exhausted: break and return the audited report
+                break
+
+        return {
+            "query": query,
+            "final_report": final_report,
+            "is_verified": verification_history[-1]["all_supported"] if verification_history else False,
+            "verification_history": verification_history,
+            "trajectory": trajectory,
+            "retrieved_chunks": retrieved_chunks,
+            "retries_used": retry_count,
+        }
+
+# example use
 if __name__ == "__main__":
     agent = RegulatoryAgent()
-    query = "Is Aducanumab (Aduhelm) authorized for prescription in both the US and EU markets? Explain why they diverged."
+    query = "Compare FDA and EMA decisions on Lecanemab (Leqembi). Did both agencies approve it, and with what restrictions?"
     
     print(f"User Query: {query}\n")
-    print("Executing ReAct Loop...")
-    result = agent.run_react_loop(query)
+    print("Executing Autonomous ReAct Loop + Two-Pass Verification...")
+    result = agent.run(query)
     
-    print("\n--- Tool Call Trajectory ---")
+    print("\n--- 1. Tool Call Trajectory ---")
     print(" -> ".join(result["trajectory"]))
     
-    print("\n--- Draft Report ---")
-    print(result["draft_report"])
+    print(f"\n--- 2. Verification Status: {'PASSED' if result['is_verified'] else 'FAILED'} (Retries Used: {result['retries_used']}) ---")
+    for audit in result["verification_history"]:
+        print(f"Attempt {audit['attempt']}: All Supported = {audit['all_supported']}")
+        if not audit["all_supported"]:
+            print(f"Feedback: {audit['feedback']}")
+            
+    print("\n--- 3. Final Verified Report ---")
+    print(result["final_report"])

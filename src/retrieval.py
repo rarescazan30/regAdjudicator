@@ -88,17 +88,3 @@ def get_drug_metadata(drug_id: str) -> Optional[Dict[str, Any]]:
                 return row
     return None
 
-if __name__ == "__main__":
-    print("--- 1. Testing Metadata Lookup ---")
-    meta = get_drug_metadata("aducanumab")
-    print("Aducanumab metadata:", meta)
-    print("\n--- 2. Testing search_fda ---")
-    fda_results = search_fda("Aducanumab accelerated approval surrogate endpoint", n_results=1)
-    for r in fda_results:
-        print(f"[{r['chunk_id']}] (Distance: {r['distance']:.4f})")
-        print(r["text"][:250], "...\n")
-    print("--- 3. Testing search_ema ---")
-    ema_results = search_ema("Aducanumab grounds for refusal", n_results=1)
-    for r in ema_results:
-        print(f"[{r['chunk_id']}] (Distance: {r['distance']:.4f})")
-        print(r["text"][:250], "...\n")
