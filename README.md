@@ -96,7 +96,7 @@ Query: "Can we market Aducanumab for Alzheimer's in both the US and EU?"
 | Layer | Choice |
 |---|---|
 | Language | Python 3.11+ (tested on Python 3.14) |
-| Agent LLM (Drafter) | Google Gemini (`gemini-3.5-flash-lite`, configurable to `gemini-3.7-flash` via `google-genai` SDK for autonomous ReAct loop & multi-hop synthesis) |
+| Agent LLM (Drafter) | Google Gemini (`gemini-3.5-flash-lite`, configurable to `gemini-3.7-flash`, via `google-genai` SDK for autonomous ReAct loop & multi-hop synthesis) |
 | Verifier LLM (Auditor) | Google Gemini (`gemini-3.5-flash-lite` with Pydantic Constrained Decoding for sub-second deterministic audits) |
 | Embeddings | `all-MiniLM-L6-v2` (Local ONNX dense vector embeddings, 384-dim) |
 | Vector Store | ChromaDB (local, persistent, cosine distance with metadata jurisdiction isolation) |
@@ -165,9 +165,9 @@ python demo.py
 
 `evals/run_evals.py` runs a 12-case automated benchmark suite against the agent, measuring:
 
-- **Trajectory Accuracy (100%)** — verifies the agent dynamically routes between FDA and EMA tools and avoids out-of-scope tools.
+- **Trajectory Accuracy** — verifies the agent dynamically routes between FDA and EMA tools and avoids out-of-scope tools.
 - **Posture Classification Precision** — checks that cross-market decisions are accurately categorized as `HARMONIZED`, `DIVERGENT`, or `INSUFFICIENT EVIDENCE`.
-- **Citation Grounding Rate (100%)** — confirms via the Two-Pass Verifier that every factual claim is strictly entailed by raw retrieved chunks.
+- **Citation Grounding Rate** — confirms via the Two-Pass Verifier that every factual claim is strictly entailed by raw retrieved chunks.
 - **Negative Control Safety** — tests that fictional compounds or off-label indications are rejected with `INSUFFICIENT EVIDENCE` rather than hallucinating approvals.
 
 ```bash
