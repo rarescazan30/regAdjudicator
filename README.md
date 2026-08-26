@@ -157,6 +157,13 @@ python -m evals.run_evals
 | **Overall Case Pass Rate** | **100.0%** (12/12) | > 90% | Passed |
 | **Average Query Latency** | **~12.5s** | < 20s | Passed |
 
+*\* **Metric Definitions:***
+- ***Trajectory Adherence:** Validates whether the agent dynamically invoked the required regulatory tools in proper sequence without calling out-of-scope APIs.*
+- ***Citation Grounding Rate:** Measures the percentage of factual claims in the final report that are strictly entailed by the cited ChromaDB source chunks (audited by the Two-Pass Verifier).*
+- ***Posture Classification Precision:** Confirms the agent correctly categorized the cross-jurisdictional outcome as `HARMONIZED`, `DIVERGENT`, or `INSUFFICIENT EVIDENCE`.*
+- ***Overall Case Pass Rate:** Percentage of test cases where all individual criteria (Trajectory, Posture, Grounding, and Keyword Recall) passed simultaneously.*
+- ***Average Query Latency:** End-to-end execution time per query, including vector retrieval, multi-hop ReAct reasoning, and verification auditing.*
+
 ## Build status
 
 - [x] Data ingestion (FDA + EMA, 4 drugs + guidance docs)
