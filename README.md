@@ -131,80 +131,9 @@ cp .env.example .env   # add your Gemini API key
 python demo.py
 ```
 
-### Interactive Demonstration (Live Terminal Output)
+### Interactive Demonstration
 
-```text
-╭───────────────────────────────────────────────────────────────────────────────╮
-│ regAdjudicator — FDA/EMA Regulatory Divergence Detection Agent                │
-│ Agent Model: gemini-3.5-flash-lite | Verifier Model: gemini-3.5-flash-lite    │
-│ Autonomous ReAct Loop • Two-Pass Grounding Verification • ChromaDB Vector RAG │
-╰───────────────────────────────────────────────────────────────────────────────╯
-╭────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│  💡 Type your regulatory question  │  [1-5] Instant Presets  │  [A] Browse Scenarios  │  [Q] Quit  │
-╰────────────────────────────────────────────────────────────────────────────────────────────────────╯
-
-Query / Option: 1
-
-Selected preset [1]: Lecanemab (Leqembi) Divergence
-Preset Query: Compare FDA and EMA approval scopes for Lecanemab (Leqembi). Did both agencies approve it and what restrictions exist regarding ApoE genotypes?
-
-                          Agent Execution Summary                          
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ Metric                    ┃ Value                                       ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ Tool Trajectory           │ get_drug_metadata ➔ search_fda ➔ search_ema │
-│ Citation Verification     │ ✓ PASSED (All Claims Grounded)              │
-│ Self-Correction Retries   │ 0                                           │
-│ Execution Latency         │ 12.30s                                      │
-│ Retrieved Evidence Chunks │ 6                                           │
-└───────────────────────────┴─────────────────────────────────────────────┘
-
-╭────────────────────────────────────────────── Final Verified Regulatory Synthesis Report ──────────────────────────────────────────────╮
-│                                                                                                                                        │
-│   • Regulatory Posture: DIVERGENT                                                                                                      │
-│   • Executive Summary: While both the US Food and Drug Administration (FDA) and the European Medicines Agency (EMA) ultimately         │
-│     granted marketing authorization for lecanemab (Leqembi) for the treatment of early Alzheimer's disease, their approval scopes      │
-│     diverge significantly regarding patient population restrictions based on genetic risk [lecanemab_ema_chunk_03]. The FDA approved   │
-│     lecanemab for the broad early Alzheimer’s population regardless of ApoE genotype [lecanemab_fda_chunk_01], whereas the EMA         │
-│     restricted authorization strictly to ApoE ε4 non-carriers and heterozygotes, explicitly excluding ApoE ε4 homozygotes              │
-│     [lecanemab_ema_chunk_01].                                                                                                          │
-│   • FDA Position & Evidence:                                                                                                           │
-│      • Approved Indication: LEQEMBI is indicated for the treatment of Alzheimer's disease in patients with mild cognitive impairment   │
-│        (MCI) or mild dementia stage of disease (early Alzheimer's disease), requiring confirmation of amyloid-beta pathology           │
-│        [lecanemab_fda_chunk_01].                                                                                                       │
-│      • Pathway: Traditional Approval.                                                                                                  │
-│      • ApoE Genotype Scope: The FDA does not restrict prescribing based on ApoE ε4 status. Although testing is recommended prior to    │
-│        initiation to inform risk discussions regarding Amyloid-Related Imaging Abnormalities (ARIA), homozygotes remain eligible for   │
-│        treatment under US labeling [lecanemab_fda_chunk_01].                                                                           │
-│      • Safety & Risk Management: Carries a Boxed Warning for ARIA (ARIA-E edema/effusion occurred in 12.6% and ARIA-H                  │
-│        microhemorrhages/siderosis in 17.3% of treated patients) [lecanemab_fda_chunk_03]. While noting that ARIA incidence is          │
-│        substantially higher in ApoE ε4 homozygotes (32.6% vs. 10.9% in heterozygotes and 5.4% in non-carriers), the FDA addressed      │
-│        this via rigorous MRI monitoring protocols rather than a population contraindication [lecanemab_fda_chunk_01,                   │
-│        lecanemab_fda_chunk_03].                                                                                                        │
-│   • EMA Position & Evidence:                                                                                                           │
-│      • Approved Indication (Restricted): Authorised for adult patients with early Alzheimer's disease who have 0 or 1 copy of the      │
-│        ApoE ε4 allele (non-carriers or heterozygotes) [lecanemab_ema_chunk_01].                                                        │
-│      • Pathway & CHMP Rationale: Following an initial negative CHMP opinion in July 2024—where regulators concluded that modest        │
-│        clinical efficacy across the total population was outweighed by severe ARIA safety risks—the applicant requested a              │
-│        re-examination with a sub-population analysis [lecanemab_ema_chunk_00]. This led to a revised positive opinion restricted to    │
-│        patients with 0 or 1 ApoE ε4 allele [lecanemab_ema_chunk_00].                                                                   │
-│      • ApoE Genotype Restrictions: Leqembi is strictly contraindicated / excluded in ApoE ε4 homozygotes (2 copies of the allele) in   │
-│        the European Union [lecanemab_ema_chunk_01]. Pre-treatment genetic testing is mandatory [lecanemab_ema_chunk_01].               │
-│      • Safety & Risk Management: Mandates a stringent Risk Management Plan, controlled distribution, clinician education, patient      │
-│        alert cards, and serial pre-infusion MRI monitoring [lecanemab_ema_chunk_03].                                                   │
-│   • Comparative Synthesis & Rationale:                                                                                                 │
-│      • Divergence on Risk-Benefit Tolerance: The divergence between the FDA and EMA highlights differing regulatory philosophies       │
-│        regarding benefit-risk assessments in neurodegenerative disease.                                                                │
-│      • FDA Approach: The FDA prioritizes patient and physician autonomy within a shared-decision-making framework. It allows           │
-│        high-risk patient subgroups (ApoE ε4 homozygotes) access to the therapy, provided they are fully informed of the markedly       │
-│        elevated ARIA risks [lecanemab_fda_chunk_01] and monitored via mandatory MRI schedules [lecanemab_fda_chunk_03].                │
-│      • EMA Approach: The EMA adopted a more conservative population-restriction strategy. Because ApoE ε4 homozygotes experience       │
-│        disproportionately severe rates of ARIA-E and ARIA-H [lecanemab_fda_chunk_03], the CHMP concluded that the benefit-risk         │
-│        balance is unfavorable for this specific genetic subgroup, leading to an explicit European exclusion [lecanemab_ema_chunk_01,   │
-│        lecanemab_ema_chunk_03].                                                                                                        │
-│                                                                                                                                        │
-╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-```
+![regAdjudicator Terminal CLI Demo](assets/terminal-preview.png)
 
 ## Evaluation
 
