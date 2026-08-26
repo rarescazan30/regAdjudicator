@@ -9,11 +9,14 @@ import time
 from typing import Dict, Any, List, Optional
 from google import genai
 from google.genai import types
+from google.genai.models import Models
+
+# Set SDK internal guard flag so it knows manual function calling is intentional
+Models._logged_afc_warning = True
 
 from src.config import GEMINI_API_KEY, GEMINI_AGENT_MODEL, call_gemini_with_retry
 from src.tools import TOOL_DEFINITIONS, execute_tool
 from src.verify import verify_draft_report, VerificationReport
-
 
 # System Prompt: Strict Guardrails and Output Structure
 SYSTEM_PROMPT = """You are the Regulatory Adjudicator Agent, an expert in comparing US (FDA) and European Union (EMA) drug approvals, indications, and clinical trial regulations.
@@ -86,6 +89,7 @@ class RegulatoryAgent:
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_PROMPT,
                     tools=gemini_tools,
+                    automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
                     temperature=0.1,  # Low temperature for deterministic factual extraction
                 ),
             )
@@ -189,15 +193,26 @@ class RegulatoryAgent:
             # If unsupported claims exist and we have retries left, trigger correction
             if retry_count < max_retries:
                 retry_count += 1
-                correction_prompt = f"""
-Your previous draft report contained factual claims that FAILED independent verification against the source chunks:
+                correction_prompt = f"""You are regenerating a regulatory report following a failed verification audit.
 
-FEEDBACK FROM AUDITOR:
+ORIGINAL USER QUERY:
+{query}
+
+PREVIOUS DRAFT REPORT:
+{final_report}
+
+AUDITOR VERIFICATION FEEDBACK:
 {verdict.feedback_for_correction}
 
 INSTRUCTIONS:
-Regenerate the report. Fix the specific claims that failed, or explicitly mark them as [INSUFFICIENT EVIDENCE].
-Preserve all accurate citations and keep the same report structure.
+Regenerate the full regulatory report adhering strictly to the SYSTEM_PROMPT format:
+- **Regulatory Posture:** Must be exactly `HARMONIZED`, `DIVERGENT`, or `INSUFFICIENT EVIDENCE`.
+- **Executive Summary:** High-level summary of the findings.
+- **FDA Position & Evidence:** Approved indication, pathway, key trial data, and citations [fda_chunk_id].
+- **EMA Position & Evidence:** Approved indication or refusal grounds, key trial data, restrictions, and citations [ema_chunk_id].
+- **Comparative Synthesis & Rationale:** Cross-jurisdictional rationale.
+
+Fix the specific ungrounded claims identified by the auditor, or explicitly mark them as [INSUFFICIENT EVIDENCE].
 """
                 # Request a corrected draft from Gemini
                 correction_response = call_gemini_with_retry(
